@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build Microservices') {
+            steps {
+                script {
+                    def mvnHome = tool name: 'Maven', type: 'hudson.tasks.Maven$MavenInstallation'
+                    def mvnCmd = "${mvnHome}/bin/mvn"
+                    
+                    sh "${mvnCmd} clean package"
+                }
+            }
+        }
+        
+        stage('Dockerize Microservices') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                        def dockerImage = docker.build("<docker-hub-username>/product-service:v1", "./product-service")
+                        dockerImage.push()
+                        
+                        // Repeat for other microservices
+                    }
+                }
+            }
+        }
+        
+        stage('Helm Deploy') {
+            steps {
+                dir('helm-charts/product-service') {
+                    sh 'helm upgrade --install product-service .'
+                }
+                // Repeat for other microservices
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'All stages completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs and configurations.'
+        }
+    }
+}
+
