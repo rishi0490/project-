@@ -1,42 +1,112 @@
-pipeline {
+ pipeline {
     agent any
     
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials-id')
+        AWS_CREDENTIALS = credentials('aws-credentials-id')
+        KUBE_CONFIG = credentials('kube-config-id')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
-        stage('Build Microservices') {
+
+        stage('Compile') {
             steps {
                 script {
                     def mvnHome = tool name: 'Maven', type: 'hudson.tasks.Maven$MavenInstallation'
-                    def mvnCmd = "${mvnHome}/bin/mvn"
-                    
-                    sh "${mvnCmd} clean package"
+                    sh "${mvnHome}/bin/mvn compile"
                 }
             }
         }
-        
-        stage('Dockerize Microservices') {
+
+        stage('Unit Test') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
-                        def dockerImage = docker.build("<docker-hub-username>/product-service:v1", "./product-service")
-                        dockerImage.push()
-                        
-                        // Repeat for other microservices
+                    def mvnHome = tool name: 'Maven', type: 'hudson.tasks.Maven$MavenInstallation'
+                    sh "${mvnHome}/bin/mvn test"
+                }
+            }
+        }
+
+        stage('Maven Build') {
+            steps {
+                script {
+                    def mvnHome = tool name: 'Maven', type: 'hudson.tasks.Maven$MavenInstallation'
+                    sh "${mvnHome}/bin/mvn clean package"
+                }
+            }
+        }
+
+        stage('Code Analysis (SonarQube)') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQubeServer') {
+                        def mvnHome = tool name: 'Maven', type: 'hudson.tasks.Maven$MavenInstallation'
+                        sh "${mvnHome}/bin/mvn sonar:sonar"
                     }
                 }
             }
         }
-        
-        stage('Helm Deploy') {
+
+        stage('Quality Test Status (SonarQube)') {
+            steps {
+                script {
+                    // Fetch and display SonarQube quality gate status
+                    def qualityGate = waitForQualityGate()
+                    if (qualityGate.status != 'OK') {
+                        error("Quality Gate failed: ${qualityGate.status}")
+                    }
+                }
+            }
+        }
+
+        stage('Dockerize') {
+            steps {
+                script {
+                    def dockerImage = docker.build("my-docker-image:${env.BUILD_NUMBER}", "./path/to/microservice")
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+
+        stage('Image Scanning (Trivy)') {
+            steps {
+                sh 'trivy image my-docker-image:${env.BUILD_NUMBER}'
+            }
+        }
+
+        stage('Terraform Provisioning') {
+            steps {
+                dir('terraform') {
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+
+        stage('Kubernetes Connection') {
+            steps {
+                withCredentials([file(credentialsId: 'kube-config-id', variable: 'KUBE_CONFIG')]) {
+                    sh 'kubectl config use-context my-kube-context'
+                }
+            }
+        }
+
+        stage('Deploy on Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'kube-config-id', variable: 'KUBE_CONFIG')]) {
+                    sh 'kubectl apply -f kubernetes'
+                }
+            }
+        }
+
+        stage('Helm Chart Deployment') {
             steps {
                 dir('helm-charts/product-service') {
                     sh 'helm upgrade --install product-service .'
@@ -44,15 +114,29 @@ pipeline {
                 // Repeat for other microservices
             }
         }
-    }
-    
-    post {
-        success {
-            echo 'All stages completed successfully.'
+
+        stage('Monitoring (Grafana & Prometheus)') {
+            steps {
+                sh 'grafana-monitor-script.sh'
+            }
         }
-        failure {
-            echo 'Pipeline failed. Check logs and configurations.'
+
+        stage('Automated Testing') {
+            steps {
+                sh 'automated-tests-script.sh'
+            }
+        }
+
+        stage('Documentation') {
+            steps {
+                sh 'generate-docs-script.sh'
+            }
+        }
+
+        stage('Presentation') {
+            steps {
+                sh 'prepare-presentation-script.sh'
+            }
         }
     }
 }
-
