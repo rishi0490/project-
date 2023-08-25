@@ -19,7 +19,7 @@ pipeline{
             steps{
             gitCheckout(
                 branch: "main",
-                url: ""
+                url: "https://github.com/rishi0490/project-.git"
             )
             }
         }
