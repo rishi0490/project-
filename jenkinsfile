@@ -19,7 +19,7 @@ pipeline{
             steps{
             gitCheckout(
                 branch: "main",
-                url: "https://github.com/vikash-kumar01/mrdevops_java_app.git"
+                url: "https://github.com/rishi0490/project-.git"
             )
             }
         }
@@ -43,7 +43,7 @@ pipeline{
                }
             }
         }
-        stage('Static code analysis: Sonarqube'){
+/*        stage('Static code analysis: Sonarqube'){
          when { expression {  params.action == 'create' } }
             steps{
                script{
@@ -63,7 +63,7 @@ pipeline{
                }
             }
         }
-        stage('Maven Build : maven'){
+  */      stage('Maven Build : maven'){
          when { expression {  params.action == 'create' } }
             steps{
                script{
