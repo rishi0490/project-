@@ -1,22 +1,6 @@
  # DevOps Microservice Project
 This project demonstrates the end-to-end implementation of a basic microservice application using various DevOps practices and tools.The entire pipeline is orchestrated using Jenkins.
 
-## Introduction
-
-This repository showcases a complete DevOps pipeline for a microservice application. It covers everything from code integration to deployment and monitoring. By following the steps outlined in this readme, you'll be able to reproduce the entire pipeline on your own environment.
-
-## Features
-
-- **Microservice**: Contains a basic "Hello World" microservice written in [language].
-- **Maven Build**: Utilizes Maven for building and packaging the microservice.
-- **Unit Testing**: Includes unit tests to ensure the functionality of the microservice.
-- **Integration**: Integrates the microservice with other components.
-- **Code Quality Analysis**: Uses SonarQube to analyze code quality and provide insights.
-- **Containerization**: Builds a Docker image of the microservice for easy deployment.
-- **Kubernetes Deployment**: Deploys the microservice on a Kubernetes cluster using Helm charts.
-- **Monitoring**: Sets up monitoring for the application using Grafana and Prometheus.
-- **Pipeline Automation**: Jenkins pipeline automates the entire process.
-
 ## Prerequisites
 
 - [Docker]
