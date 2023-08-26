@@ -1,5 +1,5 @@
  # DevOps Microservice Project
-This project demonstrates the end-to-end implementation of a basic microservice application using various DevOps practices and tools. The project includes building a simple "Hello World" microservice, performing Maven build and unit testing, integrating the service, analyzing code quality using SonarQube, containerizing the application, deploying it on Kubernetes using Helm charts, and setting up monitoring with Grafana and Prometheus. The entire pipeline is orchestrated using Jenkins.
+This project demonstrates the end-to-end implementation of a basic microservice application using various DevOps practices and tools.The entire pipeline is orchestrated using Jenkins.
 
 ## Introduction
 
@@ -20,7 +20,7 @@ This repository showcases a complete DevOps pipeline for a microservice applicat
 ## Prerequisites
 
 - [Docker]
-- [Kubernetes](kubeadm,kubectl steup)
+- [Kubernetes](kubeadm,kubectl,kubelet setup)
 - [Helm]
 - [Jenkins]
 - [SonarQube]
@@ -37,10 +37,10 @@ Follow these steps to set up and run the DevOps pipeline:
 git clone https://github.com/rishi0490/project-.git
 ```
 
-2. **Build the Microservice**: Navigate to the `HelloWorldApp` directory and build the microservice using Maven.
+2. **Build the Microservice**: Navigate to the `project` directory and build the microservice using Maven.
 
 ```bash
-cd HelloWorldApp
+cd project 
 mvn clean install
 ```
 
