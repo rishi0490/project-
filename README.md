@@ -48,12 +48,7 @@ docker build -t my-project:latest .
 
 7. **Image Scanning**: Scan the Docker image using Trivy for vulnerabilities.
 
-8. **Kubernetes Deployment**: Deploy the microservice on a Kubernetes cluster using Helm charts.
-
-```bash
-cd ../kubernetes
-helm install my-project ./microservice-chart
-```
+8. **Kubernetes Deployment**: Deploy the microservice on a Kubernetes cluster using Helm charts
 
 9. **Monitoring Setup**: Set up monitoring using Grafana and Prometheus.
 
