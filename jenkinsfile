@@ -10,6 +10,8 @@ pipeline{
         string(name: 'ImageName', description: "name of the docker build", defaultValue: 'javapp')
         string(name: 'ImageTag', description: "tag of the docker build", defaultValue: 'v1')
         string(name: 'DockerHubUser', description: "name of the Application", defaultValue: 'rishi0490')
+        string(name: 'KubeNamespace', description: 'Kubernetes namespace', defaultValue: 'default')
+        string(name: 'HelmReleaseName', description: 'Helm release name', defaultValue: 'myapp')
     }
 
     stages{
@@ -107,6 +109,52 @@ pipeline{
                    dockerImageCleanup("${params.ImageName}","${params.ImageTag}","${params.DockerHubUser}")
                }
             }
-        }      
+        }     
+ /*        stage('Kubernetes Deployment') {
+            when { expression { params.action == 'create' } }
+            steps {
+                script {
+                    kubernetesDeploy(
+                        kubeconfigId: 'kubeconfig', // You need to configure this in Jenkins
+                        namespace: "${params.KubeNamespace}",
+                        yamlPath: 'path/to/kubernetes/deployment.yaml'
+                    )
+                }
+            }
+        }
+
+           stage('Helm Chart Installation') {
+            when { expression { params.action == 'create' } }
+            steps {
+                script {
+                    helmChartInstall(
+                        releaseName: "${params.HelmReleaseName}",
+                        chartPath: 'path/to/helm/chart',
+                        valuesFile: 'path/to/values.yaml'
+                    )
+                }
+            }
+        }
+
+          
+           stage('Setup Prometheus') {
+            when { expression { params.action == 'create' } }
+            steps {
+                script {
+                    setupPrometheus()
+                }
+            }
+        }
+
+            stage('Setup Grafana') {
+            when { expression { params.action == 'create' } }
+            steps {
+                script {
+                    setupGrafana()
+                }
+            }
+        }
+
+         */
     }
 }
